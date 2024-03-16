@@ -25,7 +25,8 @@ if (method == 1):
     iterations = int(input("Iterations: "))
 
     curve = brute_force_bezier(P0, P1, P2, iterations)
-    x, y = zip(*curve)
+    x = [point.x for point in curve]
+    y= [point.y for point in curve]
 
     plt.plot(x, y)
     plt.show()
