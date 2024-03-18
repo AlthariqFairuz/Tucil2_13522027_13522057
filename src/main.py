@@ -1,43 +1,58 @@
-import timeit
 from models import Point
-from brute_force import BruteForceBezier  # Tambahkan import ini untuk BruteForceBezier
-from divide_and_conquer import DNCBezier  # Tambahkan import ini untuk DNCBezier
-print("Method available:")
-print("1. Brute Force\n2. Divide and Conquer\n3. Exit\n")
-method = int(input("Choose method: "))
+from brute_force import BruteForceBezier
+from divide_and_conquer import DNCBezier 
 
+# Input Method Validation 
+method = None
 while method not in [1, 2, 3]:
-    print("Invalid method")
-    method = int(input("Choose method: "))
+    try:
+        print("Method available:")
+        print("1. Brute Force\n2. Divide and Conquer\n3. Exit\n")
+        method = int(input("Choose method: "))
+        if method not in [1, 2, 3]:
+            print("Number not in range. Please choose 1, 2, or 3.")
+    except ValueError:
+        print("Invalid input. Please enter a valid integer.")
 
 if method == 3:
     print("Program exited.\n")
     exit()
 
-n = int(input("Number of points: "))
+# Number of Points Validation
+n = None
+while True:
+    try:
+        n = int(input("Number of points: "))
+        break 
+    except ValueError:
+        print("Invalid input. Please enter a valid integer.")
 
-print("Input your points")
-
-# Get input points from the user
+# Points Input Validation
+print("Input your points in the format 'x,y'. Example: 1,2\n")
 points_input = []
 for i in range(n):
-    point_input = input(f"P{i+1}: ").split(",")
-    points_input.append(Point(float(point_input[0]), float(point_input[1])))
+    while True:
+        point_input = input(f"P{i+1}: ").split(",")
+        if len(point_input) == 2:
+            try:
+                x = float(point_input[0])
+                y = float(point_input[1])
+                points_input.append(Point(x, y))
+                break  
+            except ValueError:
+                print("Invalid input. Please enter two numbers separated by a comma.")
+        else:
+            print("Invalid input format. Please enter two numbers separated by a comma.")
 
 iterations = int(input("Iterations: "))
 
 if method == 1:
-    bruteforce = BruteForceBezier(points_input, iterations)  # Tambahkan ini
+    bruteforce = BruteForceBezier(points_input, iterations)  
     
-    stmt = lambda: bruteforce.create_bezier_curve()
-    duration = timeit.timeit(stmt, number=1) * 1000  # Convert to milliseconds
-    curve = stmt()
+    calculate = bruteforce.create_bezier_curve()
     bruteforce.visualize_curves()
+    
 elif method == 2:
     dnc = DNCBezier(points_input, iterations)
-    stmt = lambda: dnc.calculate_dnc_bezier_points()  # Ubah pemanggilan ini
-    duration = timeit.timeit(stmt, number=1) * 1000
-    curves = stmt()
-    dnc.visualize_curves_dnc()  # Tambahkan pemanggilan fungsi visualize_curves_dnc
-
-print(f"Duration: {duration:.2f} milliseconds")
+    calculate= dnc.calculate_dnc_bezier_points(iterations)
+    dnc.visualize_curves_dnc() 

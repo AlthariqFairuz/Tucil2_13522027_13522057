@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from models import Point
+import timeit
 
 class BruteForceBezier:
     def __init__(self, points:list[Point], iterations:int) -> None:
@@ -44,10 +45,14 @@ class BruteForceBezier:
         fig, ax = plt.subplots()
 
         # Set plot limits based on the points
-        max_x = max([point.x for point in self.curve_points + self.points])
-        max_y = max([point.y for point in self.curve_points + self.points])
-        ax.set_xlim(min([point.x for point in self.points]) - 2, max_x + 2)
-        ax.set_ylim(min([point.y for point in self.points]) - 2, max_y + 2)
+        max_x = max(point.x for point in self.points)
+        max_y = max(point.y for point in self.points)
+        min_x = min(point.x for point in self.points)
+        min_y = min(point.y for point in self.points)
+        x_margin = (max_x - min_x) * 0.2  
+        y_margin = (max_y - min_y) * 0.2 
+        ax.set_xlim(min_x - x_margin, max_x + x_margin)
+        ax.set_ylim(min_y - y_margin, max_y + y_margin+2)
 
         # Initialize plot elements
         line_curve, = ax.plot([], [], label='Bezier Curve')
@@ -86,10 +91,19 @@ class BruteForceBezier:
         # Create the animation
         ani = animation.FuncAnimation(fig, update, frames=len(self.curve_points), init_func=init, blit=False, repeat=False)
 
+        execution_time = timeit.timeit(lambda: self.create_bezier_curve(), number=1) * 1000  # dalam milidetik
+
+        info_text = f'Number of Points: {len(self.curve_points)}\nExecution Time: {round(execution_time, 3)} milliseconds'
+        ax.text(0.5, 0.9, info_text, transform=ax.transAxes, fontsize=10, verticalalignment='top', ha='center', bbox=dict(facecolor='white', alpha=0.5, pad=10))
+
+        # Mengatur warna latar belakang menjadi putih dan menonaktifkan grid
+        ax.set_facecolor('white')
+        ax.grid(False)
+        
         # Plot labels and legend
-        plt.title('Bezier Curve Visualization')
+        plt.title('Bezier Curve Bruteforce Visualization')
         plt.xlabel('X-axis')
         plt.ylabel('Y-axis')
-        plt.grid(True)
-        plt.legend()
+        plt.grid(False)
+        # plt.legend()
         plt.show()

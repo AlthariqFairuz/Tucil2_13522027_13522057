@@ -1,7 +1,7 @@
-from typing import List
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from models import Point
+import timeit
 
 class DNCBezier:
     def __init__(self, points:list[Point], iterations:int):
@@ -13,9 +13,9 @@ class DNCBezier:
         """Calculate the midpoint between two points."""
         return Point((point1.x + point2.x) / 2, (point1.y + point2.y) / 2)
 
-    def populate_bezier_points(self, cp: list[Point], current_iteration: int, bezier_points: list[Point]) -> None:
+    def populate_bezier_points(self, cp: list[Point],iterations ,current_iteration: int, bezier_points: list[Point]) -> None:
         """Populate Bezier points based on control points and current iteration."""
-        if current_iteration < self.iterations:
+        if current_iteration < iterations:
             left_cp = []
             right_cp = []
             mids = cp.copy()
@@ -33,33 +33,36 @@ class DNCBezier:
             right_cp.insert(0, mids[0])
             
             # Recursively populate bezier points for left and right control points
-            self.populate_bezier_points(left_cp, current_iteration + 1, bezier_points)
+            self.populate_bezier_points(left_cp,iterations, current_iteration + 1, bezier_points)
             bezier_points.extend(mids)
-            self.populate_bezier_points(right_cp, current_iteration + 1, bezier_points)
+            self.populate_bezier_points(right_cp, iterations,current_iteration + 1, bezier_points)
 
-    def calculate_dnc_bezier_points(self) -> list[Point]:
+    # Calculate Bezier points based on control points and iterations
+    def calculate_dnc_bezier_points(self, iterations) -> list[Point]:
         # If there are less than 3 control points, return the control points
         if len(self.points) < 3:
             return self.points
 
         # Initialize the list of bezier points with the first control point
         bezier_points = [self.points[0]]
-        self.populate_bezier_points(self.points, 0, bezier_points)
+        self.populate_bezier_points(self.points,iterations, 0, bezier_points)
         bezier_points.append(self.points[-1])
         self.curve_points = bezier_points
+        
+        return bezier_points
 
-    # def generate_bezier_dnc(self,control_points: list[Point], iterations: int) -> list[list[Point]]:
-    #     """Generate Bezier curve points based on control points and iterations."""
-    #     result = []
+    def generate_bezier_dnc(self, control_points: list[Point], iterations: int) -> list[list[Point]]:
+        """Generate Bezier curve points based on control points and iterations."""
+        result = []
 
-    #     for i in range(iterations):
-    #         result.append(self.calculate_dnc_bezier_points(control_points, i+1))
+        for i in range(iterations):
+            result.append(self.calculate_dnc_bezier_points(i+1))
 
-    #     return result
+        return result
 
     def visualize_curves_dnc(self):
         """Visualize Bezier curves and main points."""
-        curve_points_list = [self.curve_points]
+        curve_points_list = self.generate_bezier_dnc(self.points, self.iterations)
         main_points = self.points
 
         fig, ax = plt.subplots()
@@ -69,10 +72,10 @@ class DNCBezier:
         max_y = max(point.y for point in main_points)
         min_x = min(point.x for point in main_points)
         min_y = min(point.y for point in main_points)
-        x_margin = (max_x - min_x) * 0.1
-        y_margin = (max_y - min_y) * 0.1
+        x_margin = (max_x - min_x) * 0.2  
+        y_margin = (max_y - min_y) * 0.2 
         ax.set_xlim(min_x - x_margin, max_x + x_margin)
-        ax.set_ylim(min_y - y_margin, max_y + y_margin)
+        ax.set_ylim(min_y - y_margin, max_y + y_margin+2)
 
         scatter_main_points = ax.scatter([], [], color='red', label='Main Points')
         lines_connect = []
@@ -110,10 +113,18 @@ class DNCBezier:
 
         ani = animation.FuncAnimation(fig, update, frames=len(curve_points_list), init_func=init,
                                       blit=False, repeat=False, interval=300)
+        
+        execution_time = timeit.timeit(lambda: self.calculate_dnc_bezier_points(self.iterations), number=1) * 1000  # dalam milidetik
 
-        plt.title('Bezier Curve Visualization')
+        info_text = f'Number of Points: {len(self.curve_points)}\nExecution Time: {round(execution_time, 3)} milliseconds'
+        ax.text(0.5, 0.9, info_text, transform=ax.transAxes, fontsize=10, verticalalignment='top', ha='center', bbox=dict(facecolor='white', alpha=0.5, pad=10))
+
+        # Mengatur warna latar belakang menjadi putih dan menonaktifkan grid
+        ax.set_facecolor('white')
+        ax.grid(False)
+
+        plt.title('Bezier Curve DNC Visualization')
         plt.xlabel('X-axis')
         plt.ylabel('Y-axis')
-        plt.grid(True)
-        plt.legend()
+        # plt.legend()
         plt.show()
