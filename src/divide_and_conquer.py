@@ -2,10 +2,6 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from models import Point
 
-def midpoint(point1: Point, point2: Point) -> Point:
-    """Calculate the midpoint between two points."""
-    return Point((point1.x + point2.x) / 2, (point1.y + point2.y) / 2)
-
 def mid_point(controlPoint1: Point, controlPoint2: Point) -> Point:
     mid = Point((controlPoint1.x + controlPoint2.x) / 2, (controlPoint1.y + controlPoint2.y) / 2)
     return mid
@@ -34,7 +30,7 @@ def populate_bezier_points(cp: list[Point], current_iteration: int, iterations: 
         populate_bezier_points(right_cp, current_iteration + 1, iterations, bezier_points)
             
 
-def yeag(cp:list[Point], iterations: int) -> list[Point]:
+def find_bezier_curve(cp:list[Point], iterations: int) -> list[Point]:
     if(len(cp) < 3):
         return cp
     bezier_points = []
@@ -48,7 +44,7 @@ def generate_bezier_dnc(control_points: list[Point], iterations: int) -> list[li
     result = []
 
     for i in range(iterations):
-        result.append(yeag(control_points, i+1))
+        result.append(find_bezier_curve(control_points, i+1))
 
     return result
 
