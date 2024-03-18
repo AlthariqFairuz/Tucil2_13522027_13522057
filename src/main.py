@@ -1,8 +1,7 @@
-from models import Point
-from divide_and_conquer import generate_bezier_dnc, visualize_curves_dnc
-from brute_force import brute_force_bezier, visualize_curves
 import timeit
-
+from models import Point
+from brute_force import BruteForceBezier  # Tambahkan import ini untuk BruteForceBezier
+from divide_and_conquer import DNCBezier  # Tambahkan import ini untuk DNCBezier
 print("Method available:")
 print("1. Brute Force\n2. Divide and Conquer\n3. Exit\n")
 method = int(input("Choose method: "))
@@ -28,14 +27,17 @@ for i in range(n):
 iterations = int(input("Iterations: "))
 
 if method == 1:
-    stmt = lambda: brute_force_bezier(points_input, iterations)
+    bruteforce = BruteForceBezier(points_input, iterations)  # Tambahkan ini
+    
+    stmt = lambda: bruteforce.create_bezier_curve()
     duration = timeit.timeit(stmt, number=1) * 1000  # Convert to milliseconds
-    curve = stmt()  # Execute the method for visualization
-    visualize_curves(curve, points_input)
+    curve = stmt()
+    bruteforce.visualize_curves()
 elif method == 2:
-    stmt = lambda: generate_bezier_dnc(points_input, iterations)
-    duration = timeit.timeit(stmt, number=1) * 1000  # Convert to milliseconds
-    curve_points_list = stmt()  # Execute the method for visualization
-    visualize_curves_dnc(curve_points_list, points_input)
+    dnc = DNCBezier(points_input, iterations)
+    stmt = lambda: dnc.calculate_dnc_bezier_points()  # Ubah pemanggilan ini
+    duration = timeit.timeit(stmt, number=1) * 1000
+    curves = stmt()
+    dnc.visualize_curves_dnc()  # Tambahkan pemanggilan fungsi visualize_curves_dnc
 
 print(f"Duration: {duration:.2f} milliseconds")
