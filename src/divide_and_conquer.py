@@ -6,23 +6,49 @@ def midpoint(point1: Point, point2: Point) -> Point:
     """Calculate the midpoint between two points."""
     return Point((point1.x + point2.x) / 2, (point1.y + point2.y) / 2)
 
+def mid_point(controlPoint1: Point, controlPoint2: Point) -> Point:
+    mid = Point((controlPoint1.x + controlPoint2.x) / 2, (controlPoint1.y + controlPoint2.y) / 2)
+    return mid
+
+def populate_bezier_points(cp: list[Point], current_iteration: int, iterations: int, bezier_points: list[Point]) -> None:
+    if current_iteration < iterations:
+        left_cp = []
+        right_cp = []
+        mids = cp.copy()
+        
+        while len(mids) > 1:
+            temp_mids = []
+            left_cp.append(mids[0])
+            right_cp.insert(0, mids[-1])  
+            for i in range(len(mids) - 1):
+                mid = mid_point(mids[i], mids[i + 1])
+                temp_mids.append(mid)
+                
+            mids = temp_mids.copy()
+            
+        left_cp.append(mids[0])
+        right_cp.insert(0, mids[0])
+        
+        populate_bezier_points(left_cp, current_iteration + 1, iterations, bezier_points)
+        bezier_points.append(mids[0]) 
+        populate_bezier_points(right_cp, current_iteration + 1, iterations, bezier_points)
+            
+
+def yeag(cp:list[Point], iterations: int) -> list[Point]:
+    if(len(cp) < 3):
+        return cp
+    bezier_points = []
+    bezier_points.append(cp[0])
+    populate_bezier_points(cp, 0, iterations, bezier_points)
+    bezier_points.append(cp[-1])
+    return bezier_points
+
 def generate_bezier_dnc(control_points: list[Point], iterations: int) -> list[list[Point]]:
     """Generate Bezier curve points based on control points and iterations."""
     result = []
-    result.append(control_points)
 
-    for _ in range(iterations):
-        new_control_points = [control_points[0]]
-        curve_points = []
-
-        for i in range(len(control_points) - 1):
-            mid = midpoint(control_points[i], control_points[i + 1])
-            new_control_points.append(mid)
-            curve_points.append(mid)
-
-        new_control_points.append(control_points[-1])
-        result.append(curve_points)
-        control_points = new_control_points
+    for i in range(iterations):
+        result.append(yeag(control_points, i+1))
 
     return result
 
