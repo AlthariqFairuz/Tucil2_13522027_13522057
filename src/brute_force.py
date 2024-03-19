@@ -94,6 +94,9 @@ class BruteForceBezier:
         execution_time = timeit.timeit(lambda: self.create_bezier_curve(), number=1) * 1000  # dalam milidetik
 
         info_text = f'Number of Points: {len(self.curve_points)}\nExecution Time: {round(execution_time, 3)} milliseconds'
+        print(info_text)
+        for i, cv in enumerate(self.curve_points):
+            print(f'Curve point {i+1}: {cv.x}, {cv.y}')
         ax.text(0.5, 0.9, info_text, transform=ax.transAxes, fontsize=10, verticalalignment='top', ha='center', bbox=dict(facecolor='white', alpha=0.5, pad=10))
 
         # Mengatur warna latar belakang menjadi putih dan menonaktifkan grid
