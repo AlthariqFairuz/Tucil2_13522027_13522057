@@ -55,8 +55,8 @@ class BruteForceBezier:
         ax.set_ylim(min_y - y_margin, max_y + y_margin+2)
 
         # Initialize plot elements
-        line_curve, = ax.plot([], [], label='Bezier Curve')
-        scatter_main_points = ax.scatter([], [], color='red', label='Main Points')
+        line_curve, = ax.plot([], [])
+        scatter_main_points = ax.scatter([], [], color='red', label='Input Points')
         scatter_curve_points = ax.scatter([], [], color='blue', label='Curve Points')
 
         lines = [line_curve]
@@ -96,7 +96,7 @@ class BruteForceBezier:
         info_text = f'Number of Points: {len(self.curve_points)}\nExecution Time: {round(execution_time, 3)} milliseconds'
         print(info_text)
         for i, cv in enumerate(self.curve_points):
-            print(f'Curve point {i+1}: {cv.x}, {cv.y}')
+            print(f'Curve point {i+1}: {round(cv.x, 4)}, {round(cv.y, 4)}')
         ax.text(0.5, 0.9, info_text, transform=ax.transAxes, fontsize=10, verticalalignment='top', ha='center', bbox=dict(facecolor='white', alpha=0.5, pad=10))
 
         # Mengatur warna latar belakang menjadi putih dan menonaktifkan grid
@@ -108,5 +108,5 @@ class BruteForceBezier:
         plt.xlabel('X-axis')
         plt.ylabel('Y-axis')
         plt.grid(False)
-        # plt.legend()
+        plt.legend()
         plt.show()
